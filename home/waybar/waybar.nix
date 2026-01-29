@@ -12,27 +12,8 @@
         mainBar = {
           layer = "top";
           position = "bottom";
-          margin-bottom = 5;
-          modules-right = [
-            "mpris"
-            "group/system"
-            "clock"
-          ];
-
-          "group/custom-tray" = {
-            orientation = "inherit";
-            modules = [
-              "idle_inhibitor"
-              "tray"
-            ];
-          };
-
-          "group/power" = {
-            orientation = "inherit";
-            modules = [
-              "custom/power"
-            ];
-          };
+          spacing = 10;
+          margin = "0 10 5 10";
 
           "group/system" = {
             orientation = "horizontal";
@@ -41,7 +22,29 @@
               "bluetooth"
               "battery"
               "pulseaudio"
+              "clock"
             ];
+          };
+
+          "group/tray-expander" = {
+            "orientation" = "inherit";
+            "drawer" = {
+              transition-duration = 600;
+              children-class = "tray-group-item";
+              transition-left-to-right = false;
+            };
+            modules = [
+              "custom/expand-icon"
+              "tray"
+            ];
+          };
+          "custom/expand-icon" = {
+            format = "";
+            tooltip = false;
+            on-scroll-up = "";
+            on-scroll-down = "";
+            on-scroll-left = "";
+            on-scroll-right = "";
           };
 
           "hyprland/workspaces" = {
@@ -67,8 +70,8 @@
             format = "{icon}";
             format-icons = {
               browser = "";
-              dev = "";
-              media = "";
+              dev = "";
+              media = "";
               communication = "";
               default = "";
             };
@@ -81,6 +84,31 @@
             icon-size = 16;
           };
 
+          privacy = {
+            icon-spacing = 4;
+            icon-size = 18;
+            transition-duration = 250;
+            modules = [
+              {
+                type = "screenshare";
+                tooltip = true;
+                tooltip-icon-size = 24;
+              }
+              {
+                type = "audio-in";
+                tooltip = true;
+                tooltip-icon-size = 24;
+              }
+            ];
+            ignore-monitor = true;
+            ignore = [
+              {
+                type = "audio-in";
+                name = "cava";
+              }
+            ];
+          };
+
           mpris = {
             format = "{player_icon} {dynamic}";
             format-paused = "{status_icon} {dynamic}";
@@ -88,17 +116,26 @@
               "title"
               "artist"
             ];
-            dynamic-len = 30;
+            dynamic-len = 40;
             player-icons = {
-              "default" = "";
+              default = "";
             };
             status-icons = {
               paused = "";
             };
           };
 
+          "group/actions" = {
+            orientation = "inherit";
+            modules = [
+              "custom/power"
+              "idle_inhibitor"
+              "group/tray-expander"
+            ];
+          };
           "custom/power" = {
             format = "";
+            tooltip = false;
             on-click = "dmenu-power";
           };
 
@@ -147,7 +184,7 @@
             on-click = "pavucontrol -t 3";
             on-click-right = "pactl --set-sink-mute 0 toggle";
           };
-          "idle_inhibitor" = {
+          idle_inhibitor = {
             format = "{icon}";
             format-icons = {
               activated = "";
@@ -156,13 +193,13 @@
           };
           clock = {
             interval = 1;
-            format = " {:%a %b %d %H:%M}";
+            format = " {:%A %H:%M}";
             on-click = "niri-launch-or-focus-webapp calendar.proton.me";
             tooltip = false;
           };
           tray = {
             icon-size = 16;
-            spacing = 10;
+            spacing = 5;
           };
           bluetooth = {
             format = "";
@@ -180,20 +217,23 @@
       (lib.mkIf (compositor == "niri") {
         mainBar = {
           modules-left = [
-            "group/power"
-            "group/custom-tray"
+            "group/actions"
             "niri/window"
           ];
           modules-center = [
             "niri/workspaces"
+          ];
+          modules-right = [
+            "mpris"
+            "privacy"
+            "group/system"
           ];
         };
       })
       (lib.mkIf (compositor == "hyprland") {
         mainBar = {
           modules-left = [
-            "group/power"
-            "group/custom-tray"
+            "tray"
             "hyprland/window"
           ];
           modules-center = [
@@ -215,9 +255,13 @@
           color: @on_background;
         }
 
+        .module {
+            padding: 0 8px;
+        }
+
         tooltip {
             background: @background;
-            border: .5px solid @outline_variant;
+            border: 1px solid @outline_variant;
         }
         tooltip label {
             color: @on_background;
@@ -235,10 +279,27 @@
             color: @error;
         }
 
+        #workspaces, 
+        #system, 
+        #window,
+        #actions, 
+        #privacy,
+        #mpris {
+            background-color: @background;
+            border-radius: 10;
+            border: 1px solid @outline_variant;
+        }
+
+        #privacy {
+            color: @tertiary;
+        }
+
       #workspaces button {
-          padding: 0 5px;
+          transition: all 0.1s ease;
+          padding: 0 10px;
           background: transparent;
           color: @on_background;
+          border-radius: 10;
       }
 
         #workspaces button.empty {
@@ -246,20 +307,9 @@
         }
 
         #workspaces button.active {
-          color: @primary;
-        }
-
-        #workspaces,
-        #window,
-        #mpris,
-        #system,
-        #power,
-        #clock,
-        #custom-tray {
-          border-radius: 10px;
-          border: .2px solid @outline_variant;
-          background-color: @background;
-          margin: 0 5px;
+          color: @on_primary;
+          background-color: @primary;
+          padding: 0 20px;
         }
 
         window#waybar.empty #window {
@@ -267,18 +317,9 @@
           background-color: transparent;
         }
 
-        #window,
-        #clock,
-        #mpris,
-        #tray,
-        #custom-power,
-        #idle_inhibitor,
-        #network,
-        #bluetooth,
-        #battery,
-        #pulseaudio,
-        #backlight {
-          padding: 0 8px;
+        #tray-expander {
+            background-color: @surface_container;
+            border-radius: 10;
         }
     '';
   };

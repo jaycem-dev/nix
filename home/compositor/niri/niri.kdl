@@ -69,7 +69,7 @@ layout {
     background-color "transparent"
 
     // Set gaps around windows in logical pixels.
-    gaps 15
+    gaps 10
 
     center-focused-column "never"
     always-center-single-column
@@ -150,7 +150,7 @@ window-rule {
 
 window-rule {
     // rounded corners
-    geometry-corner-radius 12
+    geometry-corner-radius 10
     clip-to-geometry true
 }
 
