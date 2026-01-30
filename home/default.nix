@@ -32,31 +32,28 @@
     ./hyprlock.nix
   ];
 
-  home.sessionVariables = {
-    EDITOR = "nvim";
-  };
-
-  # autocreate user dirs
-  xdg.userDirs.enable = true;
-
-  # home-manager configuration
   home = {
+    preferXdgDirectories = true;
     username = user;
     homeDirectory = "/home/${user}";
+    sessionVariables = {
+      EDITOR = "nvim";
+    };
     pointerCursor = {
       enable = true;
       package = pkgs.bibata-cursors;
       name = "Bibata-Modern-Classic";
       size = 24;
-
       gtk.enable = true;
       x11 = {
         defaultCursor = "Bibata-Modern-Classic";
         enable = true;
       };
     };
-
-    # don't change this
+    # don't change this!
     stateVersion = "25.11";
   };
+
+  # autocreate user dirs
+  xdg.userDirs.enable = true;
 }
